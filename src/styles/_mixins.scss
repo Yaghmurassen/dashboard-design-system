@@ -1,0 +1,292 @@
+// === _mixins.scss ===
+// Mixins to be used with @use "./mixins" as *;
+
+@use "sass:map";
+@use "sass:list";
+@use "sass:color";
+@use "sass:math";
+@use "sass:string";
+@use "sass:meta";
+@use "tokens" as t;
+
+// -----------------------------
+// 1) map-to-css-vars
+// Accepts a map and writes CSS custom properties inside the current selector.
+// Usage:
+// @include map-to-css-vars($colors, 'color-'); -> creates --color-<key>: <value>;
+@mixin map-to-css-vars($map, $prefix: "") {
+  @each $k, $v in $map {
+    // if value is a map, flatten with keys joined by '-' (two-level only)
+    @if meta.type-of($v) == "map" {
+      @each $subk, $subv in $v {
+        --#{$prefix}#{$k}-#{$subk}: #{$subv};
+      }
+    } @else {
+      --#{$prefix}#{$k}: #{$v};
+    }
+  }
+}
+
+// -----------------------------
+// 2) respond-to (media queries helper)
+// usage: @include respond-to("md") { ... }
+// Utilise les breakpoints depuis _tokens.scss
+@mixin respond-to($bp) {
+  $val: map.get(t.$breakpoints, $bp);
+  @if $val == null {
+    @warn "Breakpoint `#{$bp}` not found in $breakpoints map.";
+    @content;
+  } @else if $val == 0 {
+    @content;
+  } @else {
+    @media (min-width: $val) {
+      @content;
+    }
+  }
+}
+
+// -----------------------------
+// 3) fluid-type (fluid typography with clamp)
+// Usage: @include fluid-type(1rem, 1.25rem, 2rem); // min, preferred, max
+@mixin fluid-type($min, $preferred, $max) {
+  font-size: clamp(#{$min}, #{$preferred}, #{$max});
+}
+
+// -----------------------------
+// 4) focus-visible (accessible focus ring)
+// usage: @include focus-visible($color: var(--color-primary), $offset: 2px, $radius: 6px)
+@mixin focus-visible($color: var(--color-primary), $offset: 2px, $radius: 6px) {
+  &:focus {
+    outline: none;
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 $offset
+      rgba(#{str-replace(to-rgb($color), " ", ",")}, 0.18);
+    outline: 2px solid #fff; // ensures contrast with shadow
+    outline-offset: 2px;
+    border-radius: $radius;
+  }
+}
+
+// Helper reused in mixin
+@function to-rgb($c) {
+  @if meta.type-of($c) == "color" {
+    @return "#{color.red($c)} #{color.green($c)} #{color.blue($c)}";
+  }
+  @return $c;
+}
+
+// -----------------------------
+// 5) visually-hidden (sr-only)
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// -----------------------------
+// 6) transition (convenience)
+// usage: @include transition(all 200ms ease)
+@mixin transition($prop: all, $duration: 200ms, $timing: ease, $delay: 0ms) {
+  transition: $prop $duration $timing $delay;
+}
+
+// -----------------------------
+// 7) state variants (hover, focus, active) - helps BEM-style
+// usage: @include state-variants() { .btn { ... } }  // just a wrapper for readability
+@mixin state-variants {
+  &:hover {
+    @content;
+  }
+  &:focus {
+    @content;
+  }
+  &:active {
+    @content;
+  }
+}
+
+// -----------------------------
+// 8) container (max-width + padding)
+@mixin container($max: 1200px, $pad: 1rem) {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $pad;
+  padding-right: $pad;
+  max-width: $max;
+}
+
+// -----------------------------
+// 9) fluid-spacing (calc-based spacing between min and max depending on viewport)
+// usage: @include fluid-spacing(12px, 24px) -> uses clamp to compute spacing
+@mixin fluid-spacing($min, $max, $min-vw: 320px, $max-vw: 1440px) {
+  $slope: (strip-unit($max) - strip-unit($min)) /
+    (strip-unit($max-vw) - strip-unit($min-vw));
+  $intercept: strip-unit($min) - $slope * strip-unit($min-vw);
+  // construct clamp
+  $preferred: calc(#{$intercept}px + #{$slope} * 100vw);
+  // if inputs had units other than px, this naive approach may need enhancement
+  padding: clamp(#{$min}, #{$preferred}, #{$max});
+}
+
+// -----------------------------
+// 10) css-vars-from-map (map-to-css-vars with prefix & optional transform)
+// Accepts a map, prefix and an optional transform function name (as string) to apply on values
+@mixin css-vars-from-map($map, $prefix: "", $transform: null) {
+  @each $k, $v in $map {
+    $outval: $v;
+    @if $transform != null {
+      // support a few transforms by name
+      @if $transform == "to-rgb" and meta.type-of($v) == "color" {
+        $outval: "#{color.red($v)} #{color.green($v)} #{color.blue($v)}";
+      }
+      // add more transforms as needed
+    }
+    --#{$prefix}#{$k}: #{$outval};
+  }
+}
+
+// -----------------------------
+// 11) CONTAINER QUERIES (CSS Container Queries)
+// -----------------------------
+
+/// define-container() - Configure un élément comme conteneur pour container queries
+/// @param {string} $name - Nom unique du conteneur (FORTEMENT RECOMMANDÉ)
+/// @param {string} $type - Type de containment: "inline-size" (défaut), "size", "normal"
+/// Usage:
+/// @include define-container("sidebar"); // ✅ Avec nom (recommandé)
+/// @include define-container(null, "size"); // ⚠️ Sans nom (déconseillé si imbriqué)
+@mixin define-container($name: null, $type: inline-size) {
+  container-type: $type;
+
+  @if $name != null {
+    container-name: $name;
+  } @else {
+    @warn "⚠️ Container défini sans nom. Si vous avez des containers imbriqués, spécifiez un nom pour éviter des bugs : @include define-container('mon-nom')";
+  }
+}
+
+/// container-query($type, $breakpoints, $container-name) - Mixin générique pour container queries
+/// @param {string} $type - "min", "max", ou "range"
+/// @param {map} $breakpoints - Map de breakpoints avec nom => valeur
+/// @param {string} $container-name - Nom du conteneur à cibler (optionnel)
+/// Usage:
+/// @include container-query("min", ("md": 768px), "sidebar") { ... }
+@mixin container-query($type, $breakpoints, $container-name: null) {
+  @each $name, $value in $breakpoints {
+    @if $type == "min" {
+      @if $container-name {
+        @container #{$container-name} (min-width: #{$value}) {
+          @content;
+        }
+      } @else {
+        @container (min-width: #{$value}) {
+          @content;
+        }
+      }
+    } @else if $type == "max" {
+      @if $container-name {
+        @container #{$container-name} (max-width: #{$value}) {
+          @content;
+        }
+      } @else {
+        @container (max-width: #{$value}) {
+          @content;
+        }
+      }
+    } @else if
+      $type ==
+      "range" and
+      meta.type-of($value) ==
+      "list" and
+      list.length($value) ==
+      2
+    {
+      $min: list.nth($value, 1);
+      $max: list.nth($value, 2);
+      @if $container-name {
+        @container #{$container-name} (min-width: #{$min}) and (max-width: #{$max}) {
+          @content;
+        }
+      } @else {
+        @container (min-width: #{$min}) and (max-width: #{$max}) {
+          @content;
+        }
+      }
+    }
+  }
+}
+
+/// cq-min($breakpoint-name, $container-name) - Container query min-width avec token
+/// @param {string} $breakpoint-name - Nom du breakpoint depuis _tokens.scss
+/// @param {string} $container-name - Nom du conteneur à cibler (optionnel)
+/// Usage: @include cq-min("md", "sidebar") { font-size: 1.5rem; }
+@mixin cq-min($breakpoint-name, $container-name: null) {
+  $bp: map.get(t.$breakpoints, $breakpoint-name);
+  @if $bp == null {
+    @warn "Breakpoint `#{$breakpoint-name}` not found in tokens.$breakpoints.";
+  } @else {
+    @if $container-name {
+      @container #{$container-name} (min-width: #{$bp}) {
+        @content;
+      }
+    } @else {
+      @container (min-width: #{$bp}) {
+        @content;
+      }
+    }
+  }
+}
+
+/// cq-max($breakpoint-name, $container-name) - Container query max-width avec token
+/// @param {string} $breakpoint-name - Nom du breakpoint depuis _tokens.scss
+/// @param {string} $container-name - Nom du conteneur à cibler (optionnel)
+/// Usage: @include cq-max("lg", "card") { display: none; }
+@mixin cq-max($breakpoint-name, $container-name: null) {
+  $bp: map.get(t.$breakpoints, $breakpoint-name);
+  @if $bp == null {
+    @warn "Breakpoint `#{$breakpoint-name}` not found in tokens.$breakpoints.";
+  } @else {
+    @if $container-name {
+      @container #{$container-name} (max-width: #{$bp}) {
+        @content;
+      }
+    } @else {
+      @container (max-width: #{$bp}) {
+        @content;
+      }
+    }
+  }
+}
+
+/// cq-range($min-name, $max-name, $container-name) - Container query range avec tokens
+/// @param {string} $min-name - Nom du breakpoint min depuis _tokens.scss
+/// @param {string} $max-name - Nom du breakpoint max depuis _tokens.scss
+/// @param {string} $container-name - Nom du conteneur à cibler (optionnel)
+/// Usage: @include cq-range("md", "lg", "main") { padding: 2rem; }
+@mixin cq-range($min-name, $max-name, $container-name: null) {
+  $min: map.get(t.$breakpoints, $min-name);
+  $max: map.get(t.$breakpoints, $max-name);
+  @if $min == null {
+    @warn "Min breakpoint `#{$min-name}` not found in tokens.$breakpoints.";
+  } @else if $max == null {
+    @warn "Max breakpoint `#{$max-name}` not found in tokens.$breakpoints.";
+  } @else {
+    @if $container-name {
+      @container #{$container-name} (min-width: #{$min}) and (max-width: #{$max}) {
+        @content;
+      }
+    } @else {
+      @container (min-width: #{$min}) and (max-width: #{$max}) {
+        @content;
+      }
+    }
+  }
+}

@@ -1,0 +1,216 @@
+// === _functions.scss ===
+// Modern Sass utility functions for a design system
+// - Use with: @use "sass:map" as map; etc. OR import with @use "./functions" as f;
+// - Keep this file pure functions (no side-effect @include)
+
+@use "sass:map";
+@use "sass:list";
+@use "sass:color";
+@use "sass:math";
+@use "sass:string";
+@use "sass:meta";
+
+// -----------------------------
+// MAP UTILITIES
+// -----------------------------
+
+/// map-get-deep($map, $keys...)
+/// Safe retrieval from nested map (returns null if any key missing)
+@function map-get-deep($map, $keys...) {
+  $result: $map;
+  @each $k in $keys {
+    @if meta.type-of($result) != "map" {
+      @return null;
+    }
+    $result: map.get($result, $k);
+    @if $result == null {
+      @return null;
+    }
+  }
+  @return $result;
+}
+
+/// map-deep-merge($a, $b) -> merges recursively (b overwrites a)
+@function map-deep-merge($a, $b) {
+  $out: $a;
+  @each $k, $v in $b {
+    $existing: map.get($out, $k);
+    @if meta.type-of($existing) == "map" and meta.type-of($v) == "map" {
+      $out: map.merge(
+        $out,
+        (
+          $k: map-deep-merge($existing, $v),
+        )
+      );
+    } @else {
+      $out: map.merge(
+        $out,
+        (
+          $k: $v,
+        )
+      );
+    }
+  }
+  @return $out;
+}
+
+// -----------------------------
+// COLOR UTILITIES
+// -----------------------------
+
+/// to-rgb($color-or-tuple)
+/// Accepts either a color (#hex or rgb()) or a tuple (255 255 255)
+/// Returns a string usable inside rgb(...) or for CSS vars.
+@function to-rgb($c) {
+  @if meta.type-of($c) == "string" or meta.type-of($c) == "color" {
+    // If it's a color, extract channels
+    @if meta.type-of($c) == "color" {
+      @return "#{color.red($c)} #{color.green($c)} #{color.blue($c)}";
+    } @else {
+      // try parse whitespace separated tuple "255 255 255"
+      @return $c;
+    }
+  }
+  @if meta.type-of($c) == "list" {
+    // list of 3 numbers
+    @return "#{list.nth($c, 1)} #{list.nth($c, 2)} #{list.nth($c, 3)}";
+  }
+  @return null;
+}
+
+/// rgba-from-tuple($tuple, $alpha)
+/// Build rgba(...) string from tuple (255 255 255)
+@function rgba-from-tuple($tuple, $alpha: 1) {
+  $rgb: to-rgb($tuple);
+  @return unquote("rgba(#{str-replace($rgb, ' ', ', ')}, #{$alpha})");
+}
+
+/// str-replace helper (uses sass:string functions)
+@function str-replace($string, $search, $replace: "") {
+  // use string.replace if exists, else fallback (Dart Sass has string.replace)
+  @return string.replace($string, $search, $replace);
+}
+
+/// contrast-ratio($c1, $c2) -> W3C contrast ratio
+@function adjust-channel($chan) {
+  @if $chan <= 0.03928 {
+    @return $chan / 12.92;
+  } @else {
+    @return math.pow((($chan + 0.055) / 1.055), 2.4);
+  }
+}
+
+@function lum($col) {
+  $r: color.red($col) / 255;
+  $g: color.green($col) / 255;
+  $b: color.blue($col) / 255;
+
+  $r: adjust-channel($r);
+  $g: adjust-channel($g);
+  $b: adjust-channel($b);
+
+  @return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+}
+
+@function contrast-ratio($c1, $c2) {
+  // convert to color if tuples provided
+  @if meta.type-of($c1) == "list" {
+    $c1: color.rgb(list.nth($c1, 1), list.nth($c1, 2), list.nth($c1, 3));
+  }
+  @if meta.type-of($c2) == "list" {
+    $c2: color.rgb(list.nth($c2, 1), list.nth($c2, 2), list.nth($c2, 3));
+  }
+
+  $L1: lum($c1) + 0.05;
+  $L2: lum($c2) + 0.05;
+
+  @return if($L1 > $L2, $L1 / $L2, $L2 / $L1);
+}
+
+/// contrast-color($background, $light: #fff, $dark: #000, $threshold: 4.5)
+/// Returns light or dark depending on contrast ratio (WCAG)
+@function contrast-color($bg, $light: #fff, $dark: #000, $threshold: 4.5) {
+  @if meta.type-of($bg) == "list" {
+    $bg: color.rgb(list.nth($bg, 1), list.nth($bg, 2), list.nth($bg, 3));
+  }
+  $rLight: contrast-ratio($bg, $light);
+  $rDark: contrast-ratio($bg, $dark);
+  // prefer color that passes threshold; if both pass, pick highest ratio
+  @if $rLight >= $threshold and $rDark < $threshold {
+    @return $light;
+  } @else if $rDark >= $threshold and $rLight < $threshold {
+    @return $dark;
+  } @else {
+    @return if($rLight > $rDark, $light, $dark);
+  }
+}
+
+/// mix-color($a, $b, $weight)
+/// Lightweight wrapper around color.mix with weight in percent or number
+@function mix-color($a, $b, $weight: 50%) {
+  @return color.mix($a, $b, $weight);
+}
+
+/// adjust-hsl($color, $hue:0, $saturation:0, $lightness:0)
+@function adjust-hsl($color, $hue: 0deg, $saturation: 0%, $lightness: 0%) {
+  $h: color.hue($color) + $hue;
+  $s: color.saturation($color) + $saturation;
+  $l: color.lightness($color) + $lightness;
+  @return color.hsl($h, $s, $l);
+}
+
+// -----------------------------
+// LIST / STRING / MISC HELPERS
+// -----------------------------
+
+/// coalesce($values...) -> returns first non-null
+@function coalesce($values...) {
+  @each $v in $values {
+    @if $v != null {
+      @return $v;
+    }
+  }
+  @return null;
+}
+
+/// ensure-unit($value, $unit) -> e.g. ensure-unit(2, rem) => 2rem
+@function ensure-unit($value, $unit: px) {
+  @if unitless($value) {
+    @return $value * 1#{$unit};
+  }
+  @return $value;
+}
+
+/// clamp-value($min, $preferred, $max)
+/// Builds a clamp() expression string for css use. Accepts numbers with units.
+@function clamp-value($min, $preferred, $max) {
+  @return unquote("clamp(#{$min}, #{$preferred}, #{$max})");
+}
+
+// -----------------------------
+// COLOR PALETTE GENERATION
+// -----------------------------
+
+/// generate-shades($base, $steps: 9, $light: #fff, $dark: #000)
+/// Returns a map of [100..900] => color shades
+@function generate-shades($base, $steps: 9, $light: #ffffff, $dark: #000000) {
+  // steps must be odd-ish to include base in center (if desired).
+  $shades: ();
+  // Create a gradient from $light to $base to $dark
+  // Simpler approach: mix white to base for 100..500, base..black for 600..900
+  $mid-step: math.ceil($steps / 2);
+  @for $i from 1 through $steps {
+    @if $i <= $mid-step {
+      // from light -> base
+      $ratio: math.div($i - 1, $mid-step - 1) * 100%;
+      $shade: color.mix($light, $base, $ratio);
+    } @else {
+      // from base -> dark
+      $ratio: math.div($i - $mid-step, $steps - $mid-step) * 100%;
+      $shade: color.mix($base, $dark, $ratio);
+    }
+    $key: $i * 100;
+    $shades: map.set($shades, $key, $shade);
+  }
+  @return $shades;
+}

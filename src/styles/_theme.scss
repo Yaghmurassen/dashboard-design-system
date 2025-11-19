@@ -1,0 +1,62 @@
+/* === _theme.scss === */
+/* Design System Theming — DRY + Shades + Multi-brand */
+
+@use "sass:map";
+@use "sass:color";
+@use "sass:math";
+@use "tokens" as *;
+@use "mixins" as *;
+
+/* --------------------------------------------------
+   🎨 Génération automatique des nuances
+-------------------------------------------------- */
+@function generate-shades($base-color, $steps: 9) {
+  $shades: ();
+  @for $i from 1 through $steps {
+    $lightness: math.div($i - 1, $steps - 1) * 100%;
+    $shade: color.mix(white, $base-color, $lightness);
+    $shades: map.set($shades, $i * 100, $shade);
+  }
+  @return $shades;
+}
+
+/* --------------------------------------------------
+   🌈 Génération principale (Light Theme)
+-------------------------------------------------- */
+:root {
+  /* Tokens typés depuis _tokens.scss */
+  @include map-to-css-vars($colors-light, "color-");
+  @include map-to-css-vars($spacings, "space-");
+  @include map-to-css-vars($radii, "radius-");
+  @include map-to-css-vars($font-sizes, "font-size-");
+  @include map-to-css-vars($font-weights, "font-weight-");
+  @include map-to-css-vars($shadows, "shadow-");
+
+  /* Nuances dynamiques à partir du primary */
+  $primary-shades: generate-shades(map.get($colors-light, "primary"));
+
+  @each $level, $shade in $primary-shades {
+    --color-primary-#{$level}: #{$shade};
+  }
+}
+
+/* --------------------------------------------------
+   🌓 Thème sombre
+-------------------------------------------------- */
+[data-theme="dark"] {
+  @include map-to-css-vars($colors-dark, "color-");
+
+  $dark-shades: generate-shades(map.get($colors-dark, "primary"));
+  @each $level, $shade in $dark-shades {
+    --color-primary-#{$level}: #{$shade};
+  }
+}
+
+/* --------------------------------------------------
+   🏷️ Marque (Brand variants)
+-------------------------------------------------- */
+@each $brand, $tokens in $colors-brand {
+  [data-brand="#{$brand}"] {
+    @include map-to-css-vars($tokens, "color-");
+  }
+}

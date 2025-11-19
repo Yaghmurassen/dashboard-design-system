@@ -1,0 +1,55 @@
+.card {
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  transition: box-shadow var(--transition-base);
+
+  /* === PADDING VARIANTS === */
+  &PaddingNone {
+    padding: 0;
+  }
+
+  &PaddingSm {
+    padding: var(--space-sm);
+  }
+
+  &PaddingMd {
+    padding: var(--space-md);
+  }
+
+  &PaddingLg {
+    padding: var(--space-lg);
+  }
+
+  /* === ELEVATION (SHADOW) LEVELS === */
+  &Elevation0 {
+    box-shadow: none;
+  }
+
+  &Elevation1 {
+    box-shadow: var(--shadow-sm);
+  }
+
+  &Elevation2 {
+    box-shadow: var(--shadow-md);
+  }
+
+  &Elevation3 {
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* === CHILD SECTIONS === */
+  &Header {
+    margin-bottom: var(--space-md);
+  }
+
+  &Body {
+    flex: 1;
+  }
+
+  &Footer {
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-primary);
+  }
+}

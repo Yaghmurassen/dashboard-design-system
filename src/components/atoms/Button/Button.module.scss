@@ -1,0 +1,103 @@
+/**
+ * Button Component Styles
+ * SCSS with BEM naming and modern nesting
+ */
+
+.button {
+  /* Base styles */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  white-space: nowrap;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+
+  transition: background-color var(--transition-fast),
+    border-color var(--transition-fast), color var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  user-select: none;
+
+  /* === STATES === */
+  &:focus-visible {
+    outline: 2px solid var(--color-interactive);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* === VARIANTS === */
+  &--primary {
+    background-color: var(--color-interactive);
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-hover);
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--color-interactive-active);
+    }
+  }
+
+  &--secondary {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-bg-tertiary);
+      border-color: var(--color-border-secondary);
+    }
+  }
+
+  &--tertiary {
+    background-color: transparent;
+    color: var(--color-interactive);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-bg-secondary);
+    }
+  }
+
+  /* === SIZES === */
+  &--sm {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-sm);
+    min-height: 2rem;
+  }
+
+  &--md {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-base);
+    min-height: 2.5rem;
+  }
+
+  &--lg {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-md);
+    min-height: 3rem;
+  }
+
+  /* === MODIFIERS === */
+  &--full-width {
+    width: 100%;
+  }
+}
+
+/* === MEDIA QUERIES === */
+@media (prefers-contrast: high) {
+  .button {
+    border-width: 2px;
+  }
+}

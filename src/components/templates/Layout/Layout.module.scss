@@ -1,0 +1,64 @@
+/**
+ * Layout - Structure simple et propre
+ * Atomic Design + Design Tokens
+ */
+
+.layout {
+  display: grid;
+  height: 98vh;
+  overflow: hidden;
+  margin: var(--space-xm);
+
+  /* Mobile : stack vertical */
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+
+  /* Desktop : main à gauche, sidebar à droite */
+  @media (min-width: 768px) {
+    grid-template-areas:
+      "header header"
+      "main sidebar"
+      "footer footer";
+    grid-template-columns: 1fr 20vw;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  &Header {
+    grid-area: header;
+    background-color: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-primary);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  &Sidebar {
+    grid-area: sidebar;
+    border-left: 1px solid var(--color-border-primary);
+    overflow-y: scroll;
+
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  &Main {
+    grid-area: main;
+    background-color: var(--color-bg-primary);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &Footer {
+    grid-area: footer;
+    background-color: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border-primary);
+    padding: var(--space-lg);
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+}
