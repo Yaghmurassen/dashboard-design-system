@@ -6,6 +6,7 @@ $colors-light: (
   primary: #2563eb,
   secondary: #9333ea,
   accent: #f59e0b,
+  "white": #ffffff,
   neutral: (
     50: #fafafa,
     100: #f5f5f5,
@@ -16,15 +17,41 @@ $colors-light: (
   success: #22c55e,
   warning: #facc15,
   danger: #ef4444,
+  info: #3b82f6,
   active: #4180ff,
+  // Semantic states
+  disabled: #9ca3af,
+  disabled-bg: #f3f4f6,
+  focus: #2563eb,
+  focus-ring: rgba(37, 99, 235, 0.5),
+  overlay: rgba(0, 0, 0, 0.5),
+  // Base colors
   text: #111827,
-  background: #ffffff,
+  background: #f8f9fa,
+  // Background colors
+  bg-primary: #ffffff,
+  bg-secondary: #f5f5f5,
+  bg-tertiary: #e5e5e5,
+  bg-white: #ffffff,
+  // Border colors
+  border-primary: #e5e5e5,
+  border-secondary: #d6d6d6,
+  border-white: #e5e5e5,
+  // Text colors
+  text-primary: #111827,
+  text-secondary: #6b7280,
+  text-tertiary: #9ca3af,
+  // Interactive colors
+  interactive: #2563eb,
+  interactive-hover: #1d4ed8,
+  interactive-active: #1e40af,
 );
 
 $colors-dark: (
   primary: #3b82f6,
   secondary: #a855f7,
   accent: #fbbf24,
+  "black": #000000,
   neutral: (
     50: #171717,
     100: #1f2937,
@@ -35,8 +62,33 @@ $colors-dark: (
   success: #4ade80,
   warning: #fef08a,
   danger: #f87171,
+  info: #60a5fa,
+  // Semantic states
+  disabled: #6b7280,
+  disabled-bg: #374151,
+  focus: #3b82f6,
+  focus-ring: rgba(59, 130, 246, 0.5),
+  overlay: rgba(0, 0, 0, 0.7),
+  // Base colors
   text: #f9fafb,
   background: #0f172a,
+  // Background colors
+  bg-primary: #1f2937,
+  bg-secondary: #374151,
+  bg-tertiary: #4b5563,
+  bg-white: #1f2937,
+  // Border colors
+  border-primary: #374151,
+  border-secondary: #4b5563,
+  border-white: #374151,
+  // Text colors
+  text-primary: #f9fafb,
+  text-secondary: #d1d5db,
+  text-tertiary: #9ca3af,
+  // Interactive colors
+  interactive: #3b82f6,
+  interactive-hover: #2563eb,
+  interactive-active: #1d4ed8,
 );
 
 // ─── BRAND VARIANTS ────────────────────────────────────────
@@ -63,12 +115,49 @@ $font-sizes: (
   "3xl": 3rem,
 );
 
-// Font weights (Nunito disponibles: 400, 500, 600, 700)
+$font-families: (
+  base: (
+    "Nunito",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif,
+  ),
+  mono: (
+    "Fira Code",
+    "Courier New",
+    monospace,
+  ),
+);
+
 $font-weights: (
   regular: 400,
   medium: 500,
   semibold: 600,
   bold: 700,
+);
+
+// ─── LINE HEIGHTS ─────────────────────────────────────────
+$line-heights: (
+  none: 1,
+  tight: 1.25,
+  snug: 1.375,
+  normal: 1.5,
+  relaxed: 1.625,
+  loose: 2,
+);
+
+// ─── LETTER SPACING ───────────────────────────────────────
+$letter-spacings: (
+  tighter: -0.05em,
+  tight: -0.025em,
+  normal: 0em,
+  wide: 0.025em,
+  wider: 0.05em,
+  widest: 0.1em,
 );
 
 // ─── SPACING ───────────────────────────────────────────────
@@ -82,6 +171,11 @@ $spacings: (
   lg: 1.5rem,
   xl: 2rem,
   "2xl": 3rem,
+  "3xl": 4rem,
+  "4xl": 6rem,
+  "5xl": 8rem,
+  "6xl": 10rem,
+  "7xl": 12rem,
 );
 
 // ─── RADII (bordures) ─────────────────────────────────────
@@ -91,6 +185,23 @@ $radii: (
   md: 0.5rem,
   lg: 1rem,
   full: 9999px,
+);
+
+// ─── BORDERS ──────────────────────────────────────────────
+$border-widths: (
+  0: 0,
+  1: 1px,
+  2: 2px,
+  4: 4px,
+  8: 8px,
+);
+
+$borders: (
+  default: 1px solid #d6d6d6,
+  thin: 1px solid #e5e5e5,
+  medium: 2px solid #d6d6d6,
+  thick: 3px solid #d6d6d6,
+  none: none,
 );
 
 // ─── BREAKPOINTS (responsive & container queries) ─────────
@@ -112,10 +223,82 @@ $breakpoints: (
   wide: 1920px
 );
 
-/* Ombres */
+// ─── SHADOWS ──────────────────────────────────────────────
 $shadows: (
-  "sm": 0 1px 2px rgba(0, 0, 0, 0.05),
-  "md": 0 4px 6px rgba(0, 0, 0, 0.1),
-  "lg": 0 10px 15px rgba(0, 0, 0, 0.15),
-  "xl": 0 20px 25px rgba(0, 0, 0, 0.2),
+  none: none,
+  sm: 0 1px 2px rgba(0, 0, 0, 0.05),
+  md: 0 4px 6px rgba(0, 0, 0, 0.1),
+  lg: 0 10px 15px rgba(0, 0, 0, 0.15),
+  xl: 0 20px 25px rgba(0, 0, 0, 0.2),
+  inner: inset 0 2px 4px rgba(0, 0, 0, 0.06),
+);
+
+// ─── Z-INDEX (Layering) ───────────────────────────────────
+$z-indexes: (
+  base: 0,
+  dropdown: 1000,
+  sticky: 1020,
+  fixed: 1030,
+  modal-backdrop: 1040,
+  modal: 1050,
+  popover: 1060,
+  tooltip: 1070,
+  notification: 1080,
+);
+
+// ─── OPACITIES ────────────────────────────────────────────
+$opacities: (
+  0: 0,
+  10: 0.1,
+  20: 0.2,
+  30: 0.3,
+  40: 0.4,
+  50: 0.5,
+  60: 0.6,
+  70: 0.7,
+  80: 0.8,
+  90: 0.9,
+  100: 1,
+);
+
+// ─── TRANSITIONS ──────────────────────────────────────────
+$durations: (
+  instant: 0ms,
+  fast: 150ms,
+  base: 200ms,
+  slow: 300ms,
+  slower: 500ms,
+);
+
+$easings: (
+  linear: linear,
+  ease: ease,
+  ease-in: ease-in,
+  ease-out: ease-out,
+  ease-in-out: ease-in-out,
+  bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55),
+  smooth: cubic-bezier(0.4, 0, 0.2, 1),
+);
+
+$transitions: (
+  fast: 150ms ease-in-out,
+  base: 200ms ease-in-out,
+  slow: 300ms ease-in-out,
+);
+
+// ─── MAX WIDTHS (Containers) ──────────────────────────────
+$max-widths: (
+  xs: 20rem,
+  sm: 24rem,
+  md: 28rem,
+  lg: 32rem,
+  xl: 36rem,
+  "2xl": 42rem,
+  "3xl": 48rem,
+  "4xl": 56rem,
+  "5xl": 64rem,
+  "6xl": 72rem,
+  "7xl": 80rem,
+  full: 100%,
+  prose: 65ch,
 );

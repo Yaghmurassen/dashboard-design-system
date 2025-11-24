@@ -84,3 +84,19 @@ export const LayoutFooter: React.FC<LayoutProps> = ({
     {children}
   </footer>
 );
+
+/** Aside component - secondary sidebar (right side) */
+export const LayoutAside: React.FC<LayoutProps> = ({
+  children,
+  className = "",
+  ...props
+}) => (
+  <aside
+    className={clsx(styles.layoutAside, className)}
+    role="complementary"
+    aria-label="Secondary navigation"
+    {...props}
+  >
+    {children}
+  </aside>
+);

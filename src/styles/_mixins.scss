@@ -16,13 +16,21 @@
 // @include map-to-css-vars($colors, 'color-'); -> creates --color-<key>: <value>;
 @mixin map-to-css-vars($map, $prefix: "") {
   @each $k, $v in $map {
+    // Enlever les quotes des clés pour éviter --color-"white"
+    $clean-key: if(meta.type-of($k) == "string", string.unquote($k), $k);
+
     // if value is a map, flatten with keys joined by '-' (two-level only)
     @if meta.type-of($v) == "map" {
       @each $subk, $subv in $v {
-        --#{$prefix}#{$k}-#{$subk}: #{$subv};
+        $clean-subkey: if(
+          meta.type-of($subk) == "string",
+          string.unquote($subk),
+          $subk
+        );
+        --#{$prefix}#{$clean-key}-#{$clean-subkey}: #{$subv};
       }
     } @else {
-      --#{$prefix}#{$k}: #{$v};
+      --#{$prefix}#{$clean-key}: #{$v};
     }
   }
 }

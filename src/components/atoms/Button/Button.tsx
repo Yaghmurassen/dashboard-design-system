@@ -34,9 +34,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const classNames = clsx(
       styles.button,
-      styles[`${variant}`],
+      styles[`button--${variant}`],
       styles[`button--${size}`],
-      fullWidth && styles.buttonFullWidth,
+      fullWidth && styles["button--full-width"],
       className
     );
 

@@ -1,7 +1,6 @@
 /**
  * Theme Context Provider
  * Implements Context API pattern for global theme management
- * Follows React best practices with proper TypeScript typing
  */
 
 import React, {

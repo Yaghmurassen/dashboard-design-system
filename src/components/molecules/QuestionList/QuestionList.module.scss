@@ -1,0 +1,187 @@
+/**
+ * QuestionList Component Styles
+ */
+
+.questionList {
+  &Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  &Title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &Info {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 150ms ease-in-out;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  &Tooltip {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--space-xs);
+    padding: var(--space-sm);
+    background-color: var(--color-text-primary);
+    color: var(--color-white);
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    z-index: var(--z-tooltip);
+    box-shadow: var(--shadow-md);
+
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      right: 10px;
+      border: 5px solid transparent;
+      border-bottom-color: var(--color-text-primary);
+    }
+  }
+
+  &Items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  &Item {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    transition: background-color 150ms ease-in-out;
+    cursor: pointer;
+    align-items: flex-start;
+
+    &:hover {
+      background-color: var(--color-bg-secondary);
+    }
+
+    &--associated {
+      background-color: rgba(37, 99, 235, 0.08);
+      border-left: 3px solid var(--color-primary);
+      padding-left: calc(var(--space-sm) - 3px);
+
+      &:hover {
+        background-color: rgba(37, 99, 235, 0.12);
+      }
+    }
+  }
+
+  &Actions {
+    display: flex;
+    gap: var(--space-xs);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  &ActionButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-xs);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all 150ms ease-in-out;
+
+    &:hover {
+      background-color: var(--color-bg-tertiary);
+      color: var(--color-primary);
+    }
+  }
+
+  &AddButton {
+    margin-bottom: var(--space-md);
+  }
+
+  &Number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 50%;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    flex-shrink: 0;
+  }
+
+  &Content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &ItemTitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs) 0;
+    font-weight: var(--font-weight-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &ItemMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+
+  &ItemType {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-medium);
+  }
+
+  &ItemBadge {
+    font-size: var(--font-size-xs);
+    padding: 2px 6px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &ItemCurrentBadge {
+    font-size: var(--font-size-xs);
+    padding: 2px 6px;
+    background-color: #22c55e;
+    color: var(--color-white);
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-medium);
+  }
+}

@@ -30,7 +30,21 @@
   @include map-to-css-vars($radii, "radius-");
   @include map-to-css-vars($font-sizes, "font-size-");
   @include map-to-css-vars($font-weights, "font-weight-");
+  @include map-to-css-vars($line-heights, "line-height-");
+  @include map-to-css-vars($letter-spacings, "letter-spacing-");
   @include map-to-css-vars($shadows, "shadow-");
+  @include map-to-css-vars($borders, "border-");
+  @include map-to-css-vars($border-widths, "border-width-");
+  @include map-to-css-vars($transitions, "transition-");
+  @include map-to-css-vars($durations, "duration-");
+  @include map-to-css-vars($easings, "easing-");
+  @include map-to-css-vars($z-indexes, "z-");
+  @include map-to-css-vars($opacities, "opacity-");
+  @include map-to-css-vars($max-widths, "max-width-");
+
+  /* Font families */
+  --font-family-base: #{map.get($font-families, "base")};
+  --font-family-mono: #{map.get($font-families, "mono")};
 
   /* Nuances dynamiques à partir du primary */
   $primary-shades: generate-shades(map.get($colors-light, "primary"));

@@ -1,0 +1,90 @@
+/**
+ * DraggableSlide Styles
+ */
+
+.thumbnail {
+  position: relative;
+  cursor: grab;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+  height: 6rem;
+  user-select: none;
+  background-color: var(--color-bg-primary);
+
+  &:hover {
+    border-color: var(--color-interactive);
+  }
+
+  &Active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  }
+
+  &Number {
+    position: absolute;
+    top: var(--space-xs);
+    left: var(--space-xs);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    z-index: 1;
+  }
+
+  &Preview {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-md);
+    overflow: hidden;
+    height: 100%;
+    padding: 0.25rem;
+  }
+
+  &Content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-xs);
+    color: white;
+    font-size: var(--font-size-xs);
+
+    strong {
+      font-weight: var(--font-weight-semibold);
+    }
+
+    span {
+      opacity: 0.8;
+    }
+  }
+
+  &DragHandle {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    color: var(--color-text-primary);
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+    pointer-events: none;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  &:hover &DragHandle {
+    opacity: 1;
+  }
+}

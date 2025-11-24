@@ -1,13 +1,11 @@
 /**
- * Layout - Structure simple et propre
- * Atomic Design + Design Tokens
+ * Layout - Atomic Design + Design Tokens
  */
 
 .layout {
   display: grid;
-  height: 98vh;
+  height: 100vh;
   overflow: hidden;
-  margin: var(--space-xm);
 
   /* Mobile : stack vertical */
   grid-template-areas:
@@ -20,10 +18,10 @@
   /* Desktop : main à gauche, sidebar à droite */
   @media (min-width: 768px) {
     grid-template-areas:
-      "header header"
-      "main sidebar"
-      "footer footer";
-    grid-template-columns: 1fr 20vw;
+      "header header header"
+      "main sidebar aside"
+      "footer footer footer";
+    grid-template-columns: 1fr minmax(200px, 0.2fr) minmax(260px, 0.3fr);
     grid-template-rows: auto 1fr auto;
   }
 
@@ -36,8 +34,9 @@
 
   &Sidebar {
     grid-area: sidebar;
-    border-left: 1px solid var(--color-border-primary);
     overflow-y: scroll;
+    border: var(--border-default);
+    scrollbar-width: thin;
 
     @media (max-width: 767px) {
       display: none;
@@ -55,10 +54,19 @@
   &Footer {
     grid-area: footer;
     background-color: var(--color-bg-secondary);
-    border-top: 1px solid var(--color-border-primary);
     padding: var(--space-lg);
-    text-align: center;
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+  }
+
+  &Aside {
+    grid-area: aside;
+    overflow-y: auto;
+    background-color: var(--color-bg-primary);
+    border-left: 1px solid var(--color-border-primary);
+
+    @media (max-width: 767px) {
+      display: none;
+    }
   }
 }
