@@ -1,10 +1,11 @@
 /**
  * Tabs Component (Molecule)
- * Système d'onglets accessible
+ * Système d'onglets accessible avec animations
  */
 
 import React, { useState } from "react";
 import clsx from "clsx";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Tabs.module.scss";
 
 export interface Tab {
@@ -45,18 +46,40 @@ export const Tabs: React.FC<TabsProps> = ({
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.label}
+            {activeTab === tab.id && (
+              <motion.div
+                className={styles.tabsIndicator}
+                layoutId="activeTabIndicator"
+                transition={{
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 30,
+                }}
+              />
+            )}
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      <div
-        role="tabpanel"
-        id={`panel-${activeTab}`}
-        aria-labelledby={`tab-${activeTab}`}
-        className={styles.tabsPanel}
-      >
-        {activeTabContent}
+      {/* Tab Content avec animation */}
+      <div className={styles.tabsPanel}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{
+              duration: 0.25,
+              ease: "easeInOut",
+            }}
+            role="tabpanel"
+            id={`panel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
+          >
+            {activeTabContent}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

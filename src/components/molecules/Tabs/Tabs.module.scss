@@ -25,6 +25,7 @@
     transition: all 150ms ease-in-out;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
+    position: relative;
 
     &:hover {
       background-color: var(--color-bg-secondary);
@@ -33,9 +34,17 @@
 
     &--active {
       color: var(--color-primary);
-      border-bottom-color: var(--color-primary);
       background-color: transparent;
     }
+  }
+
+  &Indicator {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-primary);
   }
 
   &Panel {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Reorder } from "framer-motion";
+import { Reorder, AnimatePresence, motion } from "framer-motion";
 import {
   Layout,
   LayoutMain,
@@ -62,11 +62,15 @@ const Dashboard: React.FC = () => {
 
   const handlePrevious = () => {
     setCurrentSlide((prev) => Math.max(0, prev - 1));
+    setSlideDirection(-1);
   };
 
   const handleNext = () => {
     setCurrentSlide((prev) => Math.min(slides.length - 1, prev + 1));
+    setSlideDirection(1);
   };
+
+  const [slideDirection, setSlideDirection] = useState(0);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowLeft") handlePrevious();
@@ -78,18 +82,32 @@ const Dashboard: React.FC = () => {
     type: "insert" | "update",
     question: Omit<Question, "id">
   ) => {
+    const currentSlideId = slides[currentSlide].id;
+
     if (type === "insert") {
       const maxId =
         questionsInsert.length > 0
           ? Math.max(...questionsInsert.map((q) => q.id))
           : 0;
-      setQuestionsInsert([...questionsInsert, { ...question, id: maxId + 1 }]);
+      const newQuestion = { ...question, id: maxId + 1 };
+      setQuestionsInsert([...questionsInsert, newQuestion]);
+
+      // Auto-associer au slide actuel
+      setAssociations(
+        addAssociation(associations, newQuestion.id, currentSlideId, "insert")
+      );
     } else {
       const maxId =
         questionsUpdate.length > 0
           ? Math.max(...questionsUpdate.map((q) => q.id))
           : 0;
-      setQuestionsUpdate([...questionsUpdate, { ...question, id: maxId + 1 }]);
+      const newQuestion = { ...question, id: maxId + 1 };
+      setQuestionsUpdate([...questionsUpdate, newQuestion]);
+
+      // Auto-associer au slide actuel
+      setAssociations(
+        addAssociation(associations, newQuestion.id, currentSlideId, "update")
+      );
     }
   };
 
@@ -160,21 +178,8 @@ const Dashboard: React.FC = () => {
       )
       .map((a) => a.questionId);
 
-    // Récupérer les IDs des questions associées à d'autres slides
-    const questionsOnOtherSlides = associations
-      .filter(
-        (a) => a.slideId !== currentSlideId && a.questionType === questionType
-      )
-      .map((a) => a.questionId);
-
-    // Retourner les questions qui sont :
-    // - Soit associées au slide actuel
-    // - Soit non associées à aucun slide (disponibles)
-    return allQuestions.filter(
-      (q) =>
-        associatedQuestionIds.includes(q.id) || // Sur ce slide
-        !questionsOnOtherSlides.includes(q.id) // Pas sur un autre slide
-    );
+    // Retourner UNIQUEMENT les questions associées à ce slide
+    return allQuestions.filter((q) => associatedQuestionIds.includes(q.id));
   };
 
   // Gérer la réorganisation des slides avec Framer Motion
@@ -194,19 +199,63 @@ const Dashboard: React.FC = () => {
       <LayoutMain>
         <div className={styles.viewer} onKeyDown={handleKeyDown} tabIndex={0}>
           <div className={styles.carousel}>
-            <div className={styles.slide}>
-              <div
-                className={styles.slideBackground}
-                style={{ background: slides[currentSlide].bgColor }}
-              ></div>
-              <h2 className={styles.slideTitle}>
-                {slides[currentSlide].title}
-              </h2>
-              <p className={styles.slideSubtitle}>
-                {slides[currentSlide].subtitle}
-              </p>
-              <div className={styles.slideLine}></div>
-            </div>
+            <AnimatePresence initial={false} custom={slideDirection}>
+              <motion.div
+                key={currentSlide}
+                custom={slideDirection}
+                variants={{
+                  enter: (direction: number) => ({
+                    x: direction > 0 ? "100%" : "-100%",
+                    opacity: 0,
+                    scale: 0.95,
+                  }),
+                  center: {
+                    x: 0,
+                    opacity: 1,
+                    scale: 1,
+                  },
+                  exit: (direction: number) => ({
+                    x: direction > 0 ? "-100%" : "100%",
+                    opacity: 0,
+                    scale: 0.95,
+                  }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: {
+                    type: "tween",
+                    ease: [0.4, 0, 0.2, 1], // Cubic bezier pour fluidité
+                    duration: 0.3,
+                  },
+                  opacity: {
+                    duration: 0.25,
+                  },
+                  scale: {
+                    duration: 0.3,
+                  },
+                }}
+                className={styles.slide}
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <div
+                  className={styles.slideBackground}
+                  style={{ background: slides[currentSlide].bgColor }}
+                ></div>
+                <h2 className={styles.slideTitle}>
+                  {slides[currentSlide].title}
+                </h2>
+                <p className={styles.slideSubtitle}>
+                  {slides[currentSlide].subtitle}
+                </p>
+                <div className={styles.slideLine}></div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           <div className={styles.controls}>
@@ -316,8 +365,8 @@ const Dashboard: React.FC = () => {
                     questionsInsert,
                     "insert"
                   )}
-                  title={`Questions for Slide ${slides[currentSlide].id}`}
-                  infoTooltip="Click + to add a question to this slide. Questions with ✓ are already added."
+                  title={`Slide ${slides[currentSlide].id} - Questions`}
+                  infoTooltip="Questions added here are specific to this slide only."
                   onAdd={(q) => handleAddQuestion("insert", q)}
                   onDelete={(id) => handleDeleteQuestion("insert", id)}
                   currentSlideId={slides[currentSlide].id}
@@ -338,8 +387,8 @@ const Dashboard: React.FC = () => {
                     questionsUpdate,
                     "update"
                   )}
-                  title={`Updates for Slide ${slides[currentSlide].id}`}
-                  infoTooltip="Click + to add an update to this slide. Updates with ✓ are already added."
+                  title={`Slide ${slides[currentSlide].id} - Updates`}
+                  infoTooltip="Updates added here are specific to this slide only."
                   onEdit={(id, q) => handleEditQuestion("update", id, q)}
                   currentSlideId={slides[currentSlide].id}
                   associations={associations}
