@@ -17,27 +17,29 @@
 .formLabel {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
+  color: black;
 }
 
 .formRequired {
   color: #ef4444;
 }
-
+// ICI
 .formTextarea {
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-md);
   font-family: inherit;
   font-size: var(--font-size-base);
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
+  // color: var(--color-text-primary);
+  color: black;
+  // background-color: var(--color-bg-primary);
   resize: vertical;
   transition: border-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
 
   // Style pour simuler un placeholder quand le texte est le placeholder
   &[value="Enter your question here..."] {
-    color: var(--color-text-tertiary);
+    color: var(--color-text-primary);
+    // color: var(--color-text-primary);
     font-style: italic;
   }
 
@@ -62,8 +64,9 @@
   border-radius: var(--radius-md);
   font-family: inherit;
   font-size: var(--font-size-base);
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
+  color: black;
+  // color: var(--color-text-primary);
+  // background-color: var(--color-bg-primary);
   cursor: pointer;
   transition: border-color 150ms ease-in-out, box-shadow 150ms ease-in-out;
 

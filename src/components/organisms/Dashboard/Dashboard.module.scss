@@ -3,7 +3,9 @@
  * Layout type Wooclap : Main gauche + Sidebar droite
  */
 
-/* Viewer - Zone principale (plein écran fixe) */
+@use "@/styles/mixins" as *;
+
+/* Viewer */
 .viewer {
   display: flex;
   flex-direction: column;
@@ -11,41 +13,61 @@
   width: 100%;
   overflow: hidden;
   outline: none;
+
+  @media (max-width: 992px) {
+    height: 80vh;
+  }
 }
 
 /* === CAROUSEL === */
 .carousel {
   flex: 1;
-  // max-height: 75vh;
   display: flex;
   width: 100%;
   min-height: 0;
   background: white;
   overflow: hidden;
   position: relative;
+  width: 97%;
+  margin: 1rem auto 0 auto;
+
+  @media (min-width: 769px) {
+    border-radius: var(--radius-sm);
+    border: var(--border-default);
+    padding: var(--space-xs);
+  }
 }
 
 /* Slide individuelle */
 .slide {
   position: relative;
-  height: 100%;
   width: 100%;
-  border-radius: var(--radius-sm);
-  z-index: 0;
-  border: var(--border-default);
-  margin: var(--space-xm);
+  height: 100%;
+  // Optimisation GPU pour smooth rendering
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  transform: translateZ(0); // Force GPU acceleration
 
   &Title {
+    position: absolute;
+    left: 12rem;
+    top: 4rem;
+    width: max-content;
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: var(--font-weight-bold);
     color: #003366;
-    position: absolute;
-    top: 5rem;
-    left: 11rem;
     background: white;
     padding: 3rem 7rem;
     border-radius: 5rem;
-    // text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transform: translateZ(0);
+    will-change: auto;
+
+    @media (max-width: 992px) {
+      padding: 2rem 5rem;
+      left: 8rem;
+      top: 2rem;
+      font-size: 1.5rem;
+    }
   }
 
   &Subtitle {
@@ -54,32 +76,41 @@
     color: #009b97;
     max-width: 300px;
     text-align: left;
-    position: absolute;
-    top: 22rem;
-    left: 36rem;
-    // text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    // Évite le flash pendant l'animation
+    transform: translateZ(0);
   }
 
   &Background {
-    background: rgb(139, 199, 160);
-    width: 450px;
+    width: 6rem;
     height: 100%;
-    position: absolute;
-    left: 7rem;
-    top: 0;
-    z-index: -1;
+    margin-left: 8rem;
+    transform: translateZ(0);
+
+    @media (max-width: 992px) {
+      width: 4rem;
+      margin-left: 4rem;
+    }
   }
 
   &Line {
     position: absolute;
-    bottom: 15rem;
     height: 30px;
-    width: 30rem;
+    width: 28rem;
     background-color: #003366;
     z-index: 7;
-    left: 28rem;
     border-top-right-radius: 25rem;
     border-bottom-right-radius: 25rem;
+    bottom: -1.5rem;
+    left: -6rem;
+  }
+
+  &SubtitleContainer {
+    position: absolute;
+    bottom: 9rem;
+    left: 26.5rem;
+    width: max-content;
+    // Évite le flash pendant l'animation
+    transform: translateZ(0);
   }
 }
 
@@ -90,7 +121,7 @@
   justify-content: center;
   gap: var(--space-lg);
   padding: var(--space-lg);
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-secondary);
 
   button {
     display: flex;
@@ -146,8 +177,8 @@
   height: var(--space-4xl);
   padding: var(--space-sm);
   background-color: var(--color-white);
-  border: var(--border-default);
-  border-right: none;
+  border-top: var(--border-default);
+  // border-right: none;
 }
 
 /* === SIDEBAR - MINIATURES (droite) === */
@@ -156,13 +187,13 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-sm);
-  min-height: 6rem;
+  border-left: var(--border-default);
 }
 
 .thumbnail {
   position: relative;
   cursor: grab;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   transition: all 0.2s ease;
   overflow: hidden;

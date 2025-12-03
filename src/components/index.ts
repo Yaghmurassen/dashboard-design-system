@@ -19,6 +19,9 @@ export type { InputProps } from "./atoms/Input/Input";
 export { Modal } from "./atoms/Modal/Modal";
 export type { ModalProps } from "./atoms/Modal/Modal";
 
+export { Icon } from "./atoms/Icon/Icon";
+export type { IconProps, IconName } from "./atoms/Icon/Icon";
+
 // Molecules
 export { ThemeToggle } from "./molecules/ThemeToggle/ThemeToggle";
 export { ActionBar } from "./molecules/ActionBar/ActionBar";
@@ -43,3 +46,4 @@ export {
 
 // Organisms
 export { default as Dashboard } from "./organisms/Dashboard/Dashboard";
+export { ErrorBoundary } from "./organisms/ErrorBoundary/ErrorBoundary";

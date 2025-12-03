@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Reorder, AnimatePresence, motion } from "framer-motion";
 import {
   Layout,
+  LayoutHeader,
   LayoutMain,
   LayoutSidebar,
   LayoutAside,
@@ -14,7 +15,8 @@ import {
   DraggableSlide,
 } from "@/components";
 import { useLocalStorage } from "@/hooks";
-import { SLIDES, QUESTIONS_INSERT, QUESTIONS_UPDATE } from "@/data";
+import { useVersionedLocalStorage } from "@/utils/versionedStorage";
+import { SLIDES, QUESTIONS_INSERT } from "@/data";
 import type { Question, Slide } from "@/data";
 import { STORAGE_KEYS } from "@/utils/questionStorage";
 import type { QuestionSlideAssociation } from "@/utils/questionSlideAssociations";
@@ -30,21 +32,17 @@ const Dashboard: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Persistance de l'ordre des slides dans localStorage
-  const [slides, setSlides] = useLocalStorage<Slide[]>(
+  // Persistance de l'ordre des slides avec versioning automatique
+  // 🔥 Si SLIDES change, le cache est automatiquement invalidé
+  const [slides, setSlides] = useVersionedLocalStorage<Slide[]>(
     "wooclap-slides-order",
     SLIDES
   );
 
   // Persistance des questions dans localStorage
-  const [questionsInsert, setQuestionsInsert] = useLocalStorage<Question[]>(
+  const [questions, setQuestions] = useLocalStorage<Question[]>(
     STORAGE_KEYS.QUESTIONS_INSERT,
     QUESTIONS_INSERT
-  );
-
-  const [questionsUpdate, setQuestionsUpdate] = useLocalStorage<Question[]>(
-    STORAGE_KEYS.QUESTIONS_UPDATE,
-    QUESTIONS_UPDATE
   );
 
   // Persistance des associations question-slide
@@ -52,154 +50,163 @@ const Dashboard: React.FC = () => {
     QuestionSlideAssociation[]
   >(STORAGE_KEY_ASSOCIATIONS, []);
 
-  const filteredSlides = searchQuery.trim()
-    ? slides.filter(
-        (slide) =>
-          slide.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          slide.subtitle.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : slides;
+  // Memoize filteredSlides pour éviter les recalculs inutiles
+  const filteredSlides = useMemo(() => {
+    if (!searchQuery.trim()) return slides;
 
-  const handlePrevious = () => {
-    setCurrentSlide((prev) => Math.max(0, prev - 1));
-    setSlideDirection(-1);
-  };
+    const query = searchQuery.toLowerCase();
+    return slides.filter(
+      (slide) =>
+        slide.title.toLowerCase().includes(query) ||
+        slide.subtitle.toLowerCase().includes(query)
+    );
+  }, [slides, searchQuery]);
 
-  const handleNext = () => {
-    setCurrentSlide((prev) => Math.min(slides.length - 1, prev + 1));
-    setSlideDirection(1);
-  };
-
+  // Memoize slide direction state
   const [slideDirection, setSlideDirection] = useState(0);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowLeft") handlePrevious();
-    if (e.key === "ArrowRight") handleNext();
-  };
+  // useCallback pour les handlers de navigation
+  const handlePrevious = useCallback(() => {
+    setCurrentSlide((prev) => Math.max(0, prev - 1));
+    setSlideDirection(-1);
+  }, []);
 
-  // Fonctions pour gérer les questions
-  const handleAddQuestion = (
-    type: "insert" | "update",
-    question: Omit<Question, "id">
-  ) => {
-    const currentSlideId = slides[currentSlide].id;
+  const handleNext = useCallback(() => {
+    setCurrentSlide((prev) => Math.min(slides.length - 1, prev + 1));
+    setSlideDirection(1);
+  }, [slides.length]);
 
-    if (type === "insert") {
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowLeft") handlePrevious();
+      if (e.key === "ArrowRight") handleNext();
+    },
+    [handlePrevious, handleNext]
+  );
+
+  // Gestion des questions avec useCallback
+  const handleAddQuestion = useCallback(
+    (question: Omit<Question, "id">) => {
+      const currentSlideId = slides[currentSlide].id;
       const maxId =
-        questionsInsert.length > 0
-          ? Math.max(...questionsInsert.map((q) => q.id))
-          : 0;
+        questions.length > 0 ? Math.max(...questions.map((q) => q.id)) : 0;
       const newQuestion = { ...question, id: maxId + 1 };
-      setQuestionsInsert([...questionsInsert, newQuestion]);
 
-      // Auto-associer au slide actuel
+      setQuestions([...questions, newQuestion]);
       setAssociations(
         addAssociation(associations, newQuestion.id, currentSlideId, "insert")
       );
-    } else {
-      const maxId =
-        questionsUpdate.length > 0
-          ? Math.max(...questionsUpdate.map((q) => q.id))
-          : 0;
-      const newQuestion = { ...question, id: maxId + 1 };
-      setQuestionsUpdate([...questionsUpdate, newQuestion]);
+    },
+    [
+      slides,
+      currentSlide,
+      questions,
+      associations,
+      setQuestions,
+      setAssociations,
+    ]
+  );
 
-      // Auto-associer au slide actuel
-      setAssociations(
-        addAssociation(associations, newQuestion.id, currentSlideId, "update")
+  const handleEditQuestion = useCallback(
+    (id: number, question: Omit<Question, "id">) => {
+      setQuestions(
+        questions.map((q) => (q.id === id ? { ...question, id } : q))
       );
-    }
-  };
+    },
+    [questions, setQuestions]
+  );
 
-  const handleEditQuestion = (
-    type: "insert" | "update",
-    id: number,
-    question: Omit<Question, "id">
-  ) => {
-    if (type === "insert") {
-      setQuestionsInsert(
-        questionsInsert.map((q) => (q.id === id ? { ...question, id } : q))
-      );
-    } else {
-      setQuestionsUpdate(
-        questionsUpdate.map((q) => (q.id === id ? { ...question, id } : q))
-      );
-    }
-  };
-
-  const handleDeleteQuestion = (type: "insert" | "update", id: number) => {
-    if (type === "insert") {
-      setQuestionsInsert(questionsInsert.filter((q) => q.id !== id));
-    } else {
-      setQuestionsUpdate(questionsUpdate.filter((q) => q.id !== id));
-    }
-  };
-
-  // @ts-expect-error - Fonction disponible pour usage futur
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleResetQuestions = (type: "insert" | "update") => {
-    if (type === "insert") {
-      setQuestionsInsert(QUESTIONS_INSERT);
-    } else {
-      setQuestionsUpdate(QUESTIONS_UPDATE);
-    }
-  };
+  const handleDeleteQuestion = useCallback(
+    (id: number) => {
+      setQuestions(questions.filter((q) => q.id !== id));
+      // Nettoyer les associations
+      setAssociations(associations.filter((a) => a.questionId !== id));
+    },
+    [questions, associations, setQuestions, setAssociations]
+  );
 
   // Gérer l'association/dissociation d'une question à un slide
-  const handleToggleAssociation = (
-    questionId: number,
-    slideId: number,
-    questionType: "insert" | "update"
-  ) => {
-    if (isQuestionAssociated(associations, questionId, slideId, questionType)) {
-      // Dissocier
-      setAssociations(
-        removeAssociation(associations, questionId, slideId, questionType)
-      );
-    } else {
-      // Associer
-      setAssociations(
-        addAssociation(associations, questionId, slideId, questionType)
-      );
-    }
-  };
+  const handleToggleAssociation = useCallback(
+    (questionId: number, slideId: number) => {
+      if (isQuestionAssociated(associations, questionId, slideId, "insert")) {
+        setAssociations(
+          removeAssociation(associations, questionId, slideId, "insert")
+        );
+      } else {
+        setAssociations(
+          addAssociation(associations, questionId, slideId, "insert")
+        );
+      }
+    },
+    [associations, setAssociations]
+  );
 
-  // Obtenir les questions pour le slide actuel
-  const getQuestionsForCurrentSlide = (
-    allQuestions: Question[],
-    questionType: "insert" | "update"
-  ): Question[] => {
+  // Memoize les questions pour le slide actuel
+  const currentSlideQuestions = useMemo((): Question[] => {
     const currentSlideId = slides[currentSlide].id;
-
-    // Récupérer les IDs des questions associées au slide actuel
     const associatedQuestionIds = associations
       .filter(
-        (a) => a.slideId === currentSlideId && a.questionType === questionType
+        (a) => a.slideId === currentSlideId && a.questionType === "insert"
       )
       .map((a) => a.questionId);
 
-    // Retourner UNIQUEMENT les questions associées à ce slide
-    return allQuestions.filter((q) => associatedQuestionIds.includes(q.id));
-  };
+    return questions.filter((q) => associatedQuestionIds.includes(q.id));
+  }, [slides, currentSlide, associations, questions]);
 
   // Gérer la réorganisation des slides avec Framer Motion
-  const handleReorderSlides = (newOrder: Slide[]) => {
-    const oldSlideId = slides[currentSlide].id;
-    setSlides(newOrder);
+  const handleReorderSlides = useCallback(
+    (newOrder: Slide[]) => {
+      const oldSlideId = slides[currentSlide].id;
+      setSlides(newOrder);
 
-    // Mettre à jour l'index du slide actif
-    const newIndex = newOrder.findIndex((slide) => slide.id === oldSlideId);
-    if (newIndex !== -1) {
-      setCurrentSlide(newIndex);
-    }
-  };
+      // Mettre à jour l'index du slide actif
+      const newIndex = newOrder.findIndex((slide) => slide.id === oldSlideId);
+      if (newIndex !== -1) {
+        setCurrentSlide(newIndex);
+      }
+    },
+    [slides, currentSlide, setSlides]
+  );
+
+  // Gérer la réorganisation avec filtrage de recherche
+  const handleReorderWithFilter = useCallback(
+    (newOrder: Slide[]) => {
+      // Si on filtre, on doit merger le nouvel ordre avec les slides filtrés
+      if (searchQuery.trim()) {
+        // Créer une map des nouveaux ordres
+        const orderMap = new Map(
+          newOrder.map((slide, index) => [slide.id, index])
+        );
+        // Trier tous les slides selon le nouvel ordre
+        const sortedSlides = [...slides].sort((a, b) => {
+          const aOrder = orderMap.get(a.id) ?? Infinity;
+          const bOrder = orderMap.get(b.id) ?? Infinity;
+          return aOrder - bOrder;
+        });
+        handleReorderSlides(sortedSlides);
+      } else {
+        handleReorderSlides(newOrder);
+      }
+    },
+    [searchQuery, slides, handleReorderSlides]
+  );
 
   return (
     <Layout>
+      <LayoutHeader>
+        <h1 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 600 }}>
+          Wooclap Presentation
+        </h1>
+      </LayoutHeader>
+
       <LayoutMain>
         <div className={styles.viewer} onKeyDown={handleKeyDown} tabIndex={0}>
           <div className={styles.carousel}>
-            <AnimatePresence initial={false} custom={slideDirection}>
+            <AnimatePresence
+              initial={false}
+              mode="popLayout"
+              custom={slideDirection}
+            >
               <motion.div
                 key={currentSlide}
                 custom={slideDirection}
@@ -207,53 +214,46 @@ const Dashboard: React.FC = () => {
                   enter: (direction: number) => ({
                     x: direction > 0 ? "100%" : "-100%",
                     opacity: 0,
-                    scale: 0.95,
                   }),
                   center: {
                     x: 0,
                     opacity: 1,
-                    scale: 1,
                   },
                   exit: (direction: number) => ({
                     x: direction > 0 ? "-100%" : "100%",
                     opacity: 0,
-                    scale: 0.95,
                   }),
                 }}
                 initial="enter"
                 animate="center"
                 exit="exit"
                 transition={{
-                  x: {
-                    type: "tween",
-                    ease: [0.4, 0, 0.2, 1], // Cubic bezier pour fluidité
-                    duration: 0.3,
-                  },
-                  opacity: {
-                    duration: 0.25,
-                  },
-                  scale: {
-                    duration: 0.3,
-                  },
+                  duration: 0.25,
+                  ease: [0.4, 0, 0.2, 1],
                 }}
-                className={styles.slide}
                 style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
+                  width: "25rem",
+                  marginLeft: "6rem",
+                  position: "relative", // 🔥 FIX: Conteneur pour les absolute children
                 }}
               >
                 <div
-                  className={styles.slideBackground}
-                  style={{ background: slides[currentSlide].bgColor }}
-                ></div>
-                <h2 className={styles.slideTitle}>
-                  {slides[currentSlide].title}
-                </h2>
-                <p className={styles.slideSubtitle}>
-                  {slides[currentSlide].subtitle}
-                </p>
-                <div className={styles.slideLine}></div>
+                  className={styles.slide}
+                  style={{
+                    background: slides[currentSlide].bgColor,
+                  }}
+                >
+                  {/* Contenu de la slide */}
+                  <h2 className={styles.slideTitle}>
+                    {slides[currentSlide].title}
+                  </h2>
+                  <div className={styles.slideSubtitleContainer}>
+                    <p className={styles.slideSubtitle}>
+                      {slides[currentSlide].subtitle}
+                    </p>
+                    <div className={styles.slideLine}></div>
+                  </div>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -314,24 +314,7 @@ const Dashboard: React.FC = () => {
         <Reorder.Group
           axis="y"
           values={filteredSlides}
-          onReorder={(newOrder) => {
-            // Si on filtre, on doit merger le nouvel ordre avec les slides filtrés
-            if (searchQuery.trim()) {
-              // Créer une map des nouveaux ordres
-              const orderMap = new Map(
-                newOrder.map((slide, index) => [slide.id, index])
-              );
-              // Trier tous les slides selon le nouvel ordre
-              const sortedSlides = [...slides].sort((a, b) => {
-                const aOrder = orderMap.get(a.id) ?? Infinity;
-                const bOrder = orderMap.get(b.id) ?? Infinity;
-                return aOrder - bOrder;
-              });
-              handleReorderSlides(sortedSlides);
-            } else {
-              handleReorderSlides(newOrder);
-            }
-          }}
+          onReorder={handleReorderWithFilter}
           className={styles.thumbnails}
         >
           {filteredSlides.length ? (
@@ -352,50 +335,43 @@ const Dashboard: React.FC = () => {
         </Reorder.Group>
       </LayoutSidebar>
 
-      {/* Nouveau Aside à droite avec onglets */}
+      {/* Aside à droite avec onglets */}
       <LayoutAside>
         <Tabs
           tabs={[
             {
               id: "insert",
-              label: "Insert Question",
+              label: "Insert Questions",
+              icon: "list-view",
               content: (
                 <QuestionList
-                  questions={getQuestionsForCurrentSlide(
-                    questionsInsert,
-                    "insert"
-                  )}
-                  title={`Slide ${slides[currentSlide].id} - Questions`}
+                  questions={currentSlideQuestions}
+                  title="How to participate ?"
                   infoTooltip="Questions added here are specific to this slide only."
-                  onAdd={(q) => handleAddQuestion("insert", q)}
-                  onDelete={(id) => handleDeleteQuestion("insert", id)}
+                  onAdd={handleAddQuestion}
+                  onDelete={handleDeleteQuestion}
                   currentSlideId={slides[currentSlide].id}
                   associations={associations}
                   questionType="insert"
-                  onToggleAssociation={(qId, sId) =>
-                    handleToggleAssociation(qId, sId, "insert")
-                  }
+                  onToggleAssociation={handleToggleAssociation}
                 />
               ),
             },
             {
               id: "update",
               label: "Update Presentation",
+              icon: "update-photo",
               content: (
                 <QuestionList
-                  questions={getQuestionsForCurrentSlide(
-                    questionsUpdate,
-                    "update"
-                  )}
-                  title={`Slide ${slides[currentSlide].id} - Updates`}
-                  infoTooltip="Updates added here are specific to this slide only."
-                  onEdit={(id, q) => handleEditQuestion("update", id, q)}
+                  questions={currentSlideQuestions}
+                  title={`Update Slide ${currentSlide + 1} Questions`}
+                  infoTooltip="Click on a question to edit it."
+                  onEdit={handleEditQuestion}
+                  onDelete={handleDeleteQuestion}
                   currentSlideId={slides[currentSlide].id}
                   associations={associations}
-                  questionType="update"
-                  onToggleAssociation={(qId, sId) =>
-                    handleToggleAssociation(qId, sId, "update")
-                  }
+                  questionType="insert"
+                  onToggleAssociation={handleToggleAssociation}
                 />
               ),
             },

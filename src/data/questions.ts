@@ -3,10 +3,20 @@
  * Mock data pour les questions
  */
 
+export type QuestionType =
+  | "Multiple Choice"
+  | "Rating"
+  | "Open Text"
+  | "Poll"
+  | "Text Input"
+  | "Color Picker"
+  | "Action"
+  | "Drag & Drop";
+
 export interface Question {
   id: number;
   title: string;
-  type?: string;
+  type: QuestionType;
 }
 
 export const QUESTIONS_INSERT: Question[] = [

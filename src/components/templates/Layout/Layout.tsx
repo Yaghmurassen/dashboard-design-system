@@ -7,6 +7,7 @@ import React from "react";
 import clsx from "clsx";
 import type { BaseComponentProps } from "@/types";
 import styles from "./Layout.module.scss";
+import { ThemeToggle } from "@/components";
 
 interface LayoutProps extends BaseComponentProps {
   children: React.ReactNode;
@@ -34,7 +35,8 @@ export const LayoutHeader: React.FC<LayoutProps> = ({
     role="banner"
     {...props}
   >
-    {children}
+    {/* <div className={styles.layoutHeaderContent}>{children}</div> */}
+    <ThemeToggle />
   </header>
 );
 

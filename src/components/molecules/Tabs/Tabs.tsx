@@ -6,12 +6,15 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
+import { Icon } from "../../atoms/Icon/Icon";
+import type { IconName } from "../../atoms/Icon/Icon";
 import styles from "./Tabs.module.scss";
 
 export interface Tab {
   id: string;
   label: string;
   content: React.ReactNode;
+  icon?: IconName;
 }
 
 export interface TabsProps {
@@ -45,7 +48,10 @@ export const Tabs: React.FC<TabsProps> = ({
             })}
             onClick={() => setActiveTab(tab.id)}
           >
-            {tab.label}
+            <div className={styles.tabsTabContent}>
+              {tab.icon && <Icon name={tab.icon} size={20} />}
+              <span>{tab.label}</span>
+            </div>
             {activeTab === tab.id && (
               <motion.div
                 className={styles.tabsIndicator}

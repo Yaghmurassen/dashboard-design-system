@@ -15,7 +15,7 @@ export const SLIDES: Slide[] = [
     id: 1,
     title: "Making PowerPoint Slides",
     subtitle: "Avoiding the Pitfalls of Bad Slides",
-    bgColor: "#8bc7a0",
+    bgColor: "#9c9",
   },
   {
     id: 2,

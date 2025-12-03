@@ -11,12 +11,13 @@
   gap: var(--space-sm);
 
   font-family: var(--font-family-base);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   text-align: center;
   white-space: nowrap;
 
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--space-xl);
+
   cursor: pointer;
 
   transition: background-color var(--transition-fast),
@@ -28,7 +29,7 @@
   /* === STATES === */
   &:focus-visible {
     outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline-offset: var(--border-width-2);
   }
 
   &:disabled {
@@ -72,21 +73,18 @@
 
   /* === SIZES === */
   &--sm {
-    padding: 0rem 1rem;
-    border-radius: 2rem;
+    padding: var(--space-sm) var(--space-md);
     font-size: var(--font-size-sm);
   }
 
   &--md {
-    padding: 0.75rem 1.25rem;
-    border-radius: 2rem;
+    padding: var(--space-xs) var(--space-2xl);
     font-size: var(--font-size-base);
   }
 
   &--lg {
     font-size: var(--font-size-md);
-    padding: 1rem 3rem;
-    border-radius: 2rem;
+    padding: var(--space-md) var(--space-xl);
   }
 
   /* === MODIFIERS === */
@@ -95,6 +93,7 @@
   }
 }
 
+// a developper
 /* === MEDIA QUERIES === */
 @media (prefers-contrast: high) {
   .button {

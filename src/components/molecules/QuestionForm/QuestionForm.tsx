@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components";
-import type { Question } from "@/data";
+import type { Question, QuestionType } from "@/data";
 import styles from "./QuestionForm.module.scss";
 
 export interface QuestionFormProps {
@@ -32,7 +32,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   const [title, setTitle] = useState(
     question?.title || "Enter your question here..."
   );
-  const [type, setType] = useState(question?.type || QUESTION_TYPES[0]);
+  const [type, setType] = useState<QuestionType>(
+    (question?.type as QuestionType) || (QUESTION_TYPES[0] as QuestionType)
+  );
   const [errors, setErrors] = useState<{ title?: string }>({});
   const [isTouched, setIsTouched] = useState(!!question); // true si édition
 
@@ -85,12 +87,19 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     }
   };
 
-  // Gestion de Enter pour soumettre (Ctrl+Enter n'est plus nécessaire)
+  // Gestion de Enter pour soumettre
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Enter seul (sans Shift) soumet le formulaire
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as any);
+
+      if (!validate()) return;
+
+      const cleanTitle = title === "Enter your question here..." ? "" : title;
+      onSubmit({
+        title: cleanTitle.trim(),
+        type,
+      });
     }
     // Shift+Enter permet le retour à la ligne
   };
@@ -129,7 +138,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           id="question-type"
           className={styles.formSelect}
           value={type}
-          onChange={(e) => setType(e.target.value)}
+          onChange={(e) => setType(e.target.value as QuestionType)}
         >
           {QUESTION_TYPES.map((t) => (
             <option key={t} value={t}>

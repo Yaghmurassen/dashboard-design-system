@@ -10,31 +10,41 @@
   &Header {
     display: flex;
     gap: 0;
-    border-bottom: 2px solid var(--color-border-primary);
+    // border-bottom: 2px solid var(--color-border-primary);
   }
-
+  // GRO PROBLEME SECONDARY
   &Tab {
     flex: 1;
     padding: var(--space-sm) var(--space-md);
-    background-color: transparent;
     border: none;
     cursor: pointer;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     transition: all 150ms ease-in-out;
-    border-bottom: 2px solid transparent;
+    border-bottom: 2px solid #d6d6d6;
     margin-bottom: -2px;
     position: relative;
 
-    &:hover {
-      background-color: var(--color-bg-secondary);
-      color: var(--color-text-primary);
+    &:first-child {
+      border-right: var(--border-medium);
     }
+
+    // &:hover {
+    //   background-color: var(--color-bg-secondary);
+    // }
 
     &--active {
       color: var(--color-primary);
       background-color: transparent;
+    }
+
+    &Content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+      color: inherit; // L'icône hérite de la couleur
     }
   }
 

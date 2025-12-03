@@ -24,7 +24,7 @@
 }
 
 .modal {
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-secondary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
   max-height: 90vh;
@@ -64,13 +64,13 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-lg);
-  border-bottom: 1px solid var(--color-border-primary);
+  border-bottom: 1px solid var(--color-border-secondary);
 }
 
 .modalTitle {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -88,7 +88,7 @@
 
   &:hover {
     background-color: var(--color-bg-secondary);
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
   }
 }
 
