@@ -28,6 +28,10 @@ import {
 } from "@/utils/questionSlideAssociations";
 import styles from "./Dashboard.module.scss";
 
+// Import des icônes
+import leftArrow from "@/assets/icons/left-direction-arrow-blue.svg";
+import rightArrow from "@/assets/icons/right-direction-arrow-blue.svg";
+
 const Dashboard: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -268,12 +272,7 @@ const Dashboard: React.FC = () => {
               aria-label="Slide précédente"
               className={styles.controlButton}
             >
-              <img
-                src="/assets/icons/left-direction-arrow-blue.svg"
-                alt="Précédent"
-                width="20"
-                height="20"
-              />
+              <img src={leftArrow} alt="Précédent" width="20" height="20" />
             </Button>
             <div className={styles.controlsCounter}>
               <span className={styles.controlsCurrent}>{currentSlide + 1}</span>{" "}
@@ -286,12 +285,7 @@ const Dashboard: React.FC = () => {
               aria-label="Slide suivante"
               className={styles.controlButton}
             >
-              <img
-                src="/assets/icons/right-direction-arrow-blue.svg"
-                alt="Suivant"
-                width="20"
-                height="20"
-              />
+              <img src={rightArrow} alt="Suivant" width="20" height="20" />
             </Button>
           </div>
 
