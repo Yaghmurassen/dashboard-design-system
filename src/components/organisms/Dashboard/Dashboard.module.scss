@@ -25,28 +25,32 @@
   display: flex;
   width: 100%;
   min-height: 0;
-  background: white;
+  background: var(--color-bg-primary);
   overflow: hidden;
   position: relative;
-  width: 97%;
-  margin: 1rem auto 0 auto;
+  width: 98%;
+  margin: 0.5rem auto 0 auto;
 
   @media (min-width: 769px) {
     border-radius: var(--radius-sm);
     border: var(--border-default);
-    padding: var(--space-xs);
   }
 }
 
 /* Slide individuelle */
 .slide {
   position: relative;
-  width: 100%;
+  width: 40%;
   height: 100%;
+  margin-left: 8rem;
   // Optimisation GPU pour smooth rendering
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
   transform: translateZ(0); // Force GPU acceleration
+
+  @media (400px <= width <= 992px) {
+    margin-left: 5rem;
+  }
 
   &Title {
     position: absolute;
@@ -56,7 +60,7 @@
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: var(--font-weight-bold);
     color: #003366;
-    background: white;
+    background: var(--color-bg-primary);
     padding: 3rem 7rem;
     border-radius: 5rem;
     transform: translateZ(0);
@@ -67,6 +71,9 @@
       left: 8rem;
       top: 2rem;
       font-size: 1.5rem;
+    }
+    @media (320px <= width <= 992px) {
+      top: 4rem;
     }
   }
 
@@ -107,10 +114,14 @@
   &SubtitleContainer {
     position: absolute;
     bottom: 9rem;
-    left: 26.5rem;
+    left: 32.5rem;
     width: max-content;
     // Évite le flash pendant l'animation
     transform: translateZ(0);
+    @media (700px <= width <= 992px) {
+      left: 23rem;
+      bottom: 7rem;
+    }
   }
 }
 
@@ -130,8 +141,8 @@
     width: 22px;
     border-radius: 50%;
     padding: 6px;
-    background-color: white;
-    border: 1px #dadada solid;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-primary);
 
     picture {
       display: flex;
@@ -176,7 +187,7 @@
 .searchSection {
   height: var(--space-4xl);
   padding: var(--space-sm);
-  background-color: var(--color-white);
+  background-color: var(--color-bg-primary);
   border-top: var(--border-default);
   // border-right: none;
 }

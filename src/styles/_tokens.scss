@@ -48,47 +48,58 @@ $colors-light: (
 );
 
 $colors-dark: (
-  primary: #3b82f6,
-  secondary: #a855f7,
+  primary: #60a5fa,
+  // Bleu plus clair pour contraster
+  secondary: #a78bfa,
   accent: #fbbf24,
   "black": #000000,
   neutral: (
-    50: #171717,
-    100: #1f2937,
-    200: #374151,
-    800: #e5e5e5,
-    900: #f9fafb,
+    50: #0f172a,
+    // Très sombre
+    100: #1e293b,
+    200: #334155,
+    800: #cbd5e1,
+    900: #f1f5f9,
   ),
   success: #4ade80,
-  warning: #fef08a,
+  warning: #fde047,
   danger: #f87171,
   info: #60a5fa,
+  active: #60a5fa,
   // Semantic states
-  disabled: #6b7280,
-  disabled-bg: #374151,
-  focus: #3b82f6,
-  focus-ring: rgba(59, 130, 246, 0.5),
-  overlay: rgba(0, 0, 0, 0.7),
+  disabled: #64748b,
+  disabled-bg: #1e293b,
+  focus: #60a5fa,
+  focus-ring: rgba(96, 165, 250, 0.5),
+  overlay: rgba(0, 0, 0, 0.8),
   // Base colors
-  text: #f9fafb,
+  text: #f1f5f9,
   background: #0f172a,
-  // Background colors
-  bg-primary: #1f2937,
-  bg-secondary: #f8f9fa,
-  bg-tertiary: #4b5563,
-  bg-white: #fff,
+  // Background colors - CRITICAL FIX
+  bg-primary: #0f172a,
+  // Fond principal très sombre
+  bg-secondary: #1e293b,
+  // Fond secondaire légèrement plus clair
+  bg-tertiary: #334155,
+  // Fond tertiaire encore plus clair
+  bg-white: #ffffff,
+  // Garde blanc pour contraste
   // Border colors
-  border-primary: #374151,
-  border-secondary: #4b5563,
-  border-white: #374151,
-  // Text colors
-  text-primary: #f9fafb,
-  text-secondary: black,
-  text-tertiary: #9ca3af,
+  border-primary: #334155,
+  // Bordures plus visibles
+  border-secondary: #475569,
+  border-white: #334155,
+  // Text colors - CRITICAL FIX
+  text-primary: #f1f5f9,
+  // Texte principal clair
+  text-secondary: #94a3b8,
+  // Texte secondaire gris clair
+  text-tertiary: #64748b,
+  // Texte tertiaire gris moyen
   // Interactive colors
-  interactive: #3b82f6,
-  interactive-hover: #2563eb,
-  interactive-active: #1d4ed8,
+  interactive: #60a5fa,
+  interactive-hover: #3b82f6,
+  interactive-active: #2563eb,
 );
 
 // ─── BRAND VARIANTS ────────────────────────────────────────

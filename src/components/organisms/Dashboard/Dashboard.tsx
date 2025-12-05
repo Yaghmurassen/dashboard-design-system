@@ -231,10 +231,13 @@ const Dashboard: React.FC = () => {
                   duration: 0.25,
                   ease: [0.4, 0, 0.2, 1],
                 }}
+                // style={{
+                //   width: "25rem",
+                //   marginLeft: "6rem",
+                //   position: "relative", // 🔥 FIX: Conteneur pour les absolute children
+                // }}
                 style={{
-                  width: "25rem",
-                  marginLeft: "6rem",
-                  position: "relative", // 🔥 FIX: Conteneur pour les absolute children
+                  width: "100%",
                 }}
               >
                 <div
@@ -242,17 +245,16 @@ const Dashboard: React.FC = () => {
                   style={{
                     background: slides[currentSlide].bgColor,
                   }}
-                >
-                  {/* Contenu de la slide */}
-                  <h2 className={styles.slideTitle}>
-                    {slides[currentSlide].title}
-                  </h2>
-                  <div className={styles.slideSubtitleContainer}>
-                    <p className={styles.slideSubtitle}>
-                      {slides[currentSlide].subtitle}
-                    </p>
-                    <div className={styles.slideLine}></div>
-                  </div>
+                ></div>
+                {/* Contenu de la slide */}
+                <h2 className={styles.slideTitle}>
+                  {slides[currentSlide].title}
+                </h2>
+                <div className={styles.slideSubtitleContainer}>
+                  <p className={styles.slideSubtitle}>
+                    {slides[currentSlide].subtitle}
+                  </p>
+                  <div className={styles.slideLine}></div>
                 </div>
               </motion.div>
             </AnimatePresence>
