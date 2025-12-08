@@ -59,7 +59,7 @@
     width: max-content;
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: var(--font-weight-bold);
-    color: #003366;
+    color: var(--color-text-primary);
     background: var(--color-bg-primary);
     padding: 3rem 7rem;
     border-radius: 5rem;
@@ -121,6 +121,9 @@
     @media (700px <= width <= 992px) {
       left: 23rem;
       bottom: 7rem;
+    }
+    @media (width < 700px) {
+      left: 22rem;
     }
   }
 }
@@ -231,12 +234,12 @@
     transform: rotate(2deg) scale(0.95);
     cursor: grabbing;
   }
-
+  // ICI doublon
   &DragHandle {
     position: absolute;
     right: 8px;
     top: 8px;
-    color: var(--color-text-primary);
+    color: black;
     font-size: 18px;
     line-height: 1;
     opacity: 0;

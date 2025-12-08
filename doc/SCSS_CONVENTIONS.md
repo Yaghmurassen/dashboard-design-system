@@ -42,11 +42,6 @@ $spacings: (
 ```scss
 padding: var(--space-md); // ✅
 margin: var(--space-lg); // ✅
-
-// ❌ ÉVITER (anciennes valeurs supprimées)
-padding: var(--space-xm); // ❌ N'existe plus
-margin: var(--space-sd); // ❌ N'existe plus
-padding: var(--space-dl); // ❌ N'existe plus
 ```
 
 **Mnémotechnique** :
